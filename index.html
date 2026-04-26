@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sorting Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Sorting Algorithm Visualizer</h1>
+
+<div class="controls">
+    <select id="algorithm">
+        <option value="bubble">Bubble Sort</option>
+        <option value="selection">Selection Sort</option>
+        <option value="insertion">Insertion Sort</option>
+    </select>
+
+    <button onclick="generateArray()">Generate</button>
+    <button onclick="prevStep()">Prev</button>
+    <button onclick="nextStep()">Next</button>
+    <button onclick="playPause()">Play/Pause</button>
+
+    <br><br>
+
+    Speed:
+    <input type="range" id="speed" min="100" max="1000" value="300">
+
+    <p id="stats"></p>
+</div>
+
+<div id="array-container"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
