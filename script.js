@@ -6,6 +6,21 @@ let isPlaying = false;
 let comparisons = 0;
 let swaps = 0;
 
+// 🔥 USER INPUT
+function useUserInput() {
+    let input = document.getElementById("userInput").value;
+    array = input.split(",").map(Number);
+
+    steps = [];
+    currentStep = 0;
+    comparisons = 0;
+    swaps = 0;
+
+    renderArray(array);
+    generateSteps();
+}
+
+// RANDOM ARRAY
 function generateArray() {
     array = [];
     steps = [];
@@ -13,15 +28,15 @@ function generateArray() {
     comparisons = 0;
     swaps = 0;
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
         array.push(Math.floor(Math.random() * 100) + 10);
     }
 
     renderArray(array);
     generateSteps();
-    updateStats();
 }
 
+// RENDER
 function renderArray(arr, highlight = {}) {
     const container = document.getElementById("array-container");
     container.innerHTML = "";
@@ -31,32 +46,44 @@ function renderArray(arr, highlight = {}) {
         bar.classList.add("bar");
         bar.style.height = value + "px";
 
-        if (highlight.compare && highlight.compare.includes(index)) {
+        // show value
+        const label = document.createElement("span");
+        label.innerText = value;
+        bar.appendChild(label);
+
+        if (highlight.compare?.includes(index)) {
             bar.classList.add("compare");
         }
 
-        if (highlight.swap && highlight.swap.includes(index)) {
+        if (highlight.swap?.includes(index)) {
             bar.classList.add("swap");
+        }
+
+        if (highlight.sorted?.includes(index)) {
+            bar.classList.add("sorted");
         }
 
         container.appendChild(bar);
     });
 }
 
-function saveStep(arr, compare = [], swap = []) {
+// SAVE STEP
+function saveStep(arr, compare = [], swap = [], sorted = []) {
     steps.push({
         array: [...arr],
         compare,
-        swap
+        swap,
+        sorted
     });
 }
 
-// Bubble Sort
+// BUBBLE SORT
 function bubbleSort() {
     let arr = [...array];
 
     for (let i = 0; i < arr.length; i++) {
         for (let j = 0; j < arr.length - i - 1; j++) {
+
             comparisons++;
             saveStep(arr, [j, j + 1]);
 
@@ -66,66 +93,22 @@ function bubbleSort() {
                 saveStep(arr, [], [j, j + 1]);
             }
         }
+
+        saveStep(arr, [], [], [arr.length - i - 1]);
     }
 }
 
-// Selection Sort
-function selectionSort() {
-    let arr = [...array];
-
-    for (let i = 0; i < arr.length; i++) {
-        let min = i;
-
-        for (let j = i + 1; j < arr.length; j++) {
-            comparisons++;
-            saveStep(arr, [min, j]);
-
-            if (arr[j] < arr[min]) {
-                min = j;
-            }
-        }
-
-        swaps++;
-        [arr[i], arr[min]] = [arr[min], arr[i]];
-        saveStep(arr, [], [i, min]);
-    }
-}
-
-// Insertion Sort
-function insertionSort() {
-    let arr = [...array];
-
-    for (let i = 1; i < arr.length; i++) {
-        let key = arr[i];
-        let j = i - 1;
-
-        while (j >= 0 && arr[j] > key) {
-            comparisons++;
-            arr[j + 1] = arr[j];
-            saveStep(arr, [j, j + 1]);
-            j--;
-        }
-
-        arr[j + 1] = key;
-        swaps++;
-        saveStep(arr, [], [j + 1, i]);
-    }
-}
-
-// Generate steps
+// GENERATE STEPS
 function generateSteps() {
     let algo = document.getElementById("algorithm").value;
 
     if (algo === "bubble") bubbleSort();
-    if (algo === "selection") selectionSort();
-    if (algo === "insertion") insertionSort();
 }
 
-// Controls
+// CONTROLS
 function nextStep() {
     if (currentStep < steps.length) {
-        let step = steps[currentStep];
-        renderArray(step.array, step);
+        renderArray(steps[currentStep].array, steps[currentStep]);
         currentStep++;
         updateStats();
     }
@@ -134,8 +117,7 @@ function nextStep() {
 function prevStep() {
     if (currentStep > 0) {
         currentStep--;
-        let step = steps[currentStep];
-        renderArray(step.array, step);
+        renderArray(steps[currentStep].array, steps[currentStep]);
         updateStats();
     }
 }
@@ -156,10 +138,15 @@ function autoPlay() {
     }, speed);
 }
 
+function reset() {
+    generateArray();
+}
+
+// STATS
 function updateStats() {
     document.getElementById("stats").innerText =
         `Comparisons: ${comparisons} | Swaps: ${swaps}`;
 }
 
-// Init
+// INIT
 generateArray();
